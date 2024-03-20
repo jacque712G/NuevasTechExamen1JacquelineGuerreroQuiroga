@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Examen1.API.Ingresos": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7255",
+      "launchBrowser": false
+    }
+  }
+}
