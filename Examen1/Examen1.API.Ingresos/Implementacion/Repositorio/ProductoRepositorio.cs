@@ -37,19 +37,49 @@ namespace Examen1.API.Ingresos.Implementacion.Repositorio
                 return false;
             }
         }
-        public Task<bool> Actualizar(Producto producto)
+        public async Task<bool> Actualizar(Producto producto)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+                await tablaCliente.UpdateEntityAsync(producto, producto.ETag);
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
        
-        public Task<bool> Eliminar(string partitionkey, string rowkey)
+        public async Task<bool> Eliminar(string partitionkey, string rowkey)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+                await tablaCliente.DeleteEntityAsync(partitionkey, rowkey);
+                return true;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
         }
 
-        public Task<List<Producto>> Listar()
+        public async Task<List<Producto>> Listar()
         {
-            throw new NotImplementedException();
+            List<Producto> lista = new List<Producto>();
+            var tablaCliente = new TableClient(cadenaConexion, tablaNombre);
+
+            var productos = tablaCliente.QueryAsync<Producto>(filter: "");
+
+            await foreach (Producto producto in productos)
+            {
+                lista.Add(producto);
+            }
+            return lista;
         }
 
         public async Task<Producto> ObtenerById(string rowkey)
