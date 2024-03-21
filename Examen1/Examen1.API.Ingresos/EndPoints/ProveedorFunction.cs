@@ -81,6 +81,86 @@ namespace Examen1.API.Ingresos.EndPoints
                 return respuesta;
             }
         }
-       
+        [Function("ActualizarProveedor")]
+        [OpenApiOperation("Actualizarspec", "ActualizarProveedor", Description = "Sirve para Modificar un Proveedor")]
+        [OpenApiSecurity("passw0rd", SecuritySchemeType.ApiKey, Name = "Seguridad", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiRequestBody("application/json", typeof(Proveedor), Description = "Proveedor modelo")]
+        public async Task<HttpResponseData> ActualizarProveedor([HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "ActualizarProveedor")] HttpRequestData req)
+        {
+            HttpResponseData respuesta;
+            try
+            {
+                var registro = await req.ReadFromJsonAsync<Proveedor>() ?? throw new Exception("Debe ingresar todos los datos del Proveedor");
+                bool seActualizo = await repos.Actualizar(registro);
+                if (seActualizo)
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    return respuesta;
+                }
+                else
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.BadRequest);
+                    return respuesta;
+                }
+            }
+            catch (Exception)
+            {
+
+                respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+        [Function("EliminarProveedor")]
+        [OpenApiOperation("Eliminarspec", "EliminarProveedor", Description = "Sirve para Eliminar un Proveedor")]
+        [OpenApiSecurity("passw0rd", SecuritySchemeType.ApiKey, Name = "Seguridad", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "partitionkey", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        [OpenApiParameter(name: "rowkey", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        public async Task<HttpResponseData> EliminarProveedor([HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "EliminarProveedor/{partitionkey}/{rowkey}")] HttpRequestData req, string partitionkey, string rowkey)
+        {
+            HttpResponseData respuesta;
+            try
+            {
+                bool seElimino = await repos.Eliminar(partitionkey, rowkey);
+                if (seElimino)
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    return respuesta;
+                }
+                else
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.BadRequest);
+                    return respuesta;
+                }
+            }
+            catch (Exception)
+            {
+
+                respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
+        [Function("ListarProveedores")]
+        [OpenApiOperation("Listarspec", "ListarProveedores", Description = "Sirve para listar todos los Proveedores")]
+        [OpenApiSecurity("passw0rd", SecuritySchemeType.ApiKey, Name = "Seguridad", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Proveedor>), Description = "Mostrara una Lista de Proveedores")]
+        public async Task<HttpResponseData> ListarProveedores([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ListarProveedores")] HttpRequestData req)
+        {
+            HttpResponseData respuesta;
+            try
+            {
+                var lista = repos.Listar();
+                respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(lista.Result);
+                return respuesta;
+            }
+            catch (Exception)
+            {
+
+                respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+
     }
 }
