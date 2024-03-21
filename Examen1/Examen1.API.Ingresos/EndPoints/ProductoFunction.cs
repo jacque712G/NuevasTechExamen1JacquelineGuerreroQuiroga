@@ -81,5 +81,85 @@ namespace Examen1.API.Ingresos.EndPoints
                 return respuesta;
             }
         }
+
+        [Function("ActualizarProducto")]
+        [OpenApiOperation("Actualizarspec", "ActualizarProducto", Description = "Sirve para Actualizar un Producto")]
+        [OpenApiSecurity("passw0rd", SecuritySchemeType.ApiKey, Name = "Seguridad", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiRequestBody("application/json", typeof(Producto), Description = "Producto modelo")]
+        public async Task<HttpResponseData> ActualizarProducto([HttpTrigger(AuthorizationLevel.Function, "put", Route = "ActualizarProducto")] HttpRequestData req)
+        {
+            HttpResponseData respuesta;
+            try
+            {
+                var registro = await req.ReadFromJsonAsync<Producto>() ?? throw new Exception("Debe ingresar todos los datos del Producto");
+                bool seActualizo = await repos.Actualizar(registro);
+                if (seActualizo)
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    return respuesta;
+                }
+                else
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.BadRequest);
+                    return respuesta;
+                }
+            }
+            catch (Exception)
+            {
+
+                respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+        [Function("EliminarProducto")]
+        [OpenApiOperation("Eliminarspec", "EliminarProducto", Description = "Sirve para Eliminar un Producto")]
+        [OpenApiSecurity("passw0rd", SecuritySchemeType.ApiKey, Name = "Seguridad", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiParameter(name: "partitionkey", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        [OpenApiParameter(name: "rowkey", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        public async Task<HttpResponseData> EliminarProducto([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "EliminarProducto/{partitionkey}/{rowkey}")] HttpRequestData req, string partitionkey, string rowkey)
+        {
+            HttpResponseData respuesta;
+            try
+            {
+                bool seElimino = await repos.Eliminar(partitionkey, rowkey);
+                if (seElimino)
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.OK);
+                    return respuesta;
+                }
+                else
+                {
+                    respuesta = req.CreateResponse(HttpStatusCode.BadRequest);
+                    return respuesta;
+                }
+            }
+            catch (Exception)
+            {
+
+                respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
+        [Function("ListarProductos")]
+        [OpenApiOperation("Listarspec", "ListarProductos", Description = "Sirve para listar todos los Productos")]
+        [OpenApiSecurity("passw0rd", SecuritySchemeType.ApiKey, Name = "Seguridad", In = OpenApiSecurityLocationType.Query)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(List<Producto>), Description = "Mostrara una Lista de Productos")]
+        public async Task<HttpResponseData> ListarProductos([HttpTrigger(AuthorizationLevel.Function, "get", Route = "ListarProductos")] HttpRequestData req)
+        {
+            HttpResponseData respuesta;
+            try
+            {
+                var lista = repos.Listar();
+                respuesta = req.CreateResponse(HttpStatusCode.OK);
+                await respuesta.WriteAsJsonAsync(lista.Result);
+                return respuesta;
+            }
+            catch (Exception)
+            {
+
+                respuesta = req.CreateResponse(HttpStatusCode.InternalServerError);
+                return respuesta;
+            }
+        }
     }
 }
