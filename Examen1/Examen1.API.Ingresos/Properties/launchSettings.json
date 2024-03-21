@@ -3,7 +3,9 @@
     "Examen1.API.Ingresos": {
       "commandName": "Project",
       "commandLineArgs": "--port 7255",
-      "launchBrowser": false
+      "environmentVariables": {
+        "cadenaconexion": "BlobEndpoint=https://examen1guerrero.blob.core.windows.net/;QueueEndpoint=https://examen1guerrero.queue.core.windows.net/;FileEndpoint=https://examen1guerrero.file.core.windows.net/;TableEndpoint=https://examen1guerrero.table.core.windows.net/;SharedAccessSignature=sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2024-05-02T23:36:58Z&st=2024-03-20T23:36:58Z&spr=https&sig=owocFUSt4Zt7PoRct%2FIqXMVF8jSQyDxIjTsQS2u8PtI%3D"
+      }
     }
   }
 }
